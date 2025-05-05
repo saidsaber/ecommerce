@@ -6,7 +6,7 @@ $_SESSION['error'] = [];
 function isRequired($ProductData){
     $isError = false;
     foreach($ProductData as $field => $value){
-        if($field == 'category'){
+        if($field == 'category' || $field == 'ditials'){
             continue;
         }
         if(required($value , $field) != 1){
@@ -23,10 +23,12 @@ function isRequired($ProductData){
 }
 
 function lengthMoreFour($ProductData){
+
     $_SESSION['error'] = [];
     $isError = isNum($ProductData);
     foreach($ProductData as $field => $value){
-        if($field == 'category' || $field == 'NumberOfPieces' ||$field == 'Price' || $field == 'ditials'){
+        if($field == 'category' ||$field == 'Price' || $field == 'ditials'){
+            $_SESSION['error'] += [$field => [1 , $value]];
             continue;
         }
         if(length($value , $field) != 1){
@@ -34,7 +36,6 @@ function lengthMoreFour($ProductData){
         }
         $_SESSION['error'] += [$field => [length($value , $field) , $value]];
     }
-    $_SESSION['error'] += ['category' => [1 , $ProductData['category']]];
     return $isError;
 }
 
@@ -46,11 +47,6 @@ function isNum($ProductData){
     }
     $_SESSION['error'] += ['Price' => [1 , $ProductData['Price'] ]];
 
-    if(!is_numeric($ProductData['NumberOfPieces']) || $ProductData['NumberOfPieces'] < 1){
-        $_SESSION['error'] += ['NumberOfPieces' => ['this field must be numeric more than 0' , $ProductData['NumberOfPieces']]];
-        $isError = true;
-    }
-    $_SESSION['error'] += ['NumberOfPieces' => [1 , $ProductData['NumberOfPieces']]];
     return $isError;
 }
 function image($ProductData){
@@ -74,6 +70,7 @@ function saveImage($ProductData){
 }
 
 function validation($ProductData){
+    
     if(isRequired($ProductData)){
         header("Location: ../admin/CreateProduct.php");
         exit;
@@ -82,10 +79,12 @@ function validation($ProductData){
         header("Location: ../admin/CreateProduct.php");
         exit;
     }
+    // exit;
     if(image($ProductData)){
         header("Location: ../admin/CreateProduct.php");
         exit;
     }
+    detailCorect($ProductData);
     $ProductData = saveImage($ProductData);
     saveDataInDataBase($ProductData);
     header("Location: ../admin/CreateProduct.php");
@@ -96,44 +95,78 @@ function saveDataInDataBase($ProductData){
     $userId = $_SESSION['user'];
     $ProductName = $_POST['ProductName'];
     $Price = $ProductData['Price'];
-    $NumberOfPieces = $ProductData['NumberOfPieces'];
     $category = $ProductData['category'];
-    $Title = $ProductData['Title'];
-    $Description = $ProductData['Description'];
+    $Description = $ProductData['Title'];
     $imagePath = $ProductData['path'];
-
-    $query = "INSERT INTO products ( `userId`, `cateId`, `productName`, `price`, `discription`) VALUES
-    ('$userId' , '$category' , '$ProductName' , '$Price' , '$Description')";
+    $haveDetails = empty($ProductData['ditials'])? 0 : 1;
+    $query = "INSERT INTO products ( `userId`, `cateId`, `productName`, `price`, `discription` , `haveDetails`) VALUES
+    ('$userId' , '$category' , '$ProductName' , '$Price' , '$Description' , '$haveDetails')";
     mysqli_query($GLOBALS['conn'] , $query);
 
     $primaryId = $GLOBALS['conn']->insert_id;
-    addDetails($ProductData , $primaryId);
+    // addDetails($ProductData , $primaryId);
     $query = "INSERT INTO `image` (productId ,imagePath ) VALUES ('$primaryId' , '$imagePath')";
     mysqli_query($GLOBALS['conn'] , $query);
 }
 
-function addDetails($ProductData , $productId){
+function detailCorect($ProductData){
+    if(empty($ProductData['ditials'])){
+        return 1;
+    }
     $detail = explode(',' , $ProductData['ditials']);
 
     $detailData = [];
-    $i = 1;
+    foreach($detail as $value){
+        if(count(explode('-' , $value) ) == 4){
+            $size =explode('-' , $value)[0];
+            $color =explode('-' , $value)[1];
+            $count =explode('-' , $value)[2];
+            $colorHexCod =explode('-' , $value)[3];
+        }else{
+            $_SESSION['error'] += ['ditials' => ['Please write in the correct style.' , $ProductData['ditials']]];
+            header("Location: ../admin/CreateProduct.php");
+            exit;
+        }
+        
+        $detailData[] =[
+                'size' => $size,
+                'color' => $color,
+                'count' => $count,
+                'colorHexCod' => $colorHexCod
+        ];
+    }
+}
+function addDetails($ProductData , $productId){
+    if(empty($ProductData['ditials'])){
+        return 1;
+    }
+    $detail = explode(',' , $ProductData['ditials']);
+    echo '<pre>';
+    print_r($detail);
+    $detailData = [];
     foreach($detail as $value){
         $size =explode('-' , $value)[0];
         $color =explode('-' , $value)[1];
         $count =explode('-' , $value)[2];
-
-        $detailData +=[
-            $i =>[
+        $colorHexCod =explode('-' , $value)[3];
+        
+        
+        $detailData[] =[
                 'size' => $size,
                 'color' => $color,
-                'count' => $count
-            ],
+                'count' => $count,
+                'colorHexCod' => $colorHexCod
         ];
-        $i++;
     }
+    echo '<pre>';
+    print_r($detailData);
+    // exit;   
     foreach($detailData as $detailDat){
-        $query = "INSERT INTO productinfo (productId , count , size , color) value
-         ('$productId' , '{$detailDat['count']}' , '{$detailDat['size']}' , '{$detailDat['color']}')";
-         mysqli_query($GLOBALS['conn'] , $query);
+        $query = "INSERT INTO color (productId , colorName , colorHexCode) value ('$productId' , '{$detailDat['color']}' , '{$detailDat['colorHexCod']}')";
+        mysqli_query($GLOBALS['conn'] , $query);
+        $primaryId = 0;
+        $primaryId = $GLOBALS['conn']->insert_id;
+        $query = "INSERT INTO size (colorId , productId , sizeName , count) value ('$primaryId' , '$productId' , '{$detailDat['size']}' , '{$detailDat['count']}')";
+        mysqli_query($GLOBALS['conn'] , $query);
     }
 }

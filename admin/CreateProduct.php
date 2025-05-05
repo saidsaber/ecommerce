@@ -65,6 +65,7 @@ $res = mysqli_query($conn , $query);
         padding: 12px;
     }
 </style>
+
 <body>
     <div class="con">
         <form action="../headers/CreateProduct.php" method="post" enctype="multipart/form-data">
@@ -83,15 +84,8 @@ $res = mysqli_query($conn , $query);
                 <?= error('Price')?>
             </div>
             <div class="form-floating mb-3 div">
-                <input type="text" class="form-control" id="NumberOfPieces" name="NumberOfPieces" placeholder="NumberOfPieces" value="<?= old('NumberOfPieces')?>">
-                <label for="NumberOfPieces">Number Of Pieces</label>
-            </div>
-            <div class="alert alert-danger" role="alert" style="display: <?= show('NumberOfPieces')?>">
-                <?= error('NumberOfPieces')?>
-            </div>
-            <div class="form-floating mb-3 div">
-                <input type="text" class="form-control" id="ditials" name="ditials" placeholder="ditials" value="<?= old('ditials')?>">
-                <label for="ditials">ditials</label>
+                <input type="text" class="form-control" id="ditials" name="ditials" placeholder="ditials " value="<?= old('ditials')?>">
+                <label for="ditials">ditials size-color-count-hexColorCode</label>
             </div>
             <div class="alert alert-danger" role="alert" style="display: <?= show('ditials')?>">
                 <?= error('ditials')?>
@@ -118,13 +112,6 @@ $res = mysqli_query($conn , $query);
             </div>
             <div class="alert alert-danger" role="alert" style="display: <?= show('Title')?>">
                 <?= error('Title')?>
-            </div>
-            <div class="form-floating mb-3 div">    
-                <textarea class="form-control" id="Description" rows="3" placeholder="Description" name="Description"><?= old('Description')?></textarea>
-                <label for="Description">Description</label>
-            </div>
-            <div class="alert alert-danger" role="alert" style="display: <?= show('Description')?>">
-                <?= error('Description')?>
             </div>
             <div class="input-group mb-3">
                 <div class="custom-file">
@@ -153,8 +140,6 @@ $res = mysqli_query($conn , $query);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <?php
-        // echo '<pre>';
-        // print_r($_SESSION['error']);
         $_SESSION['error'] = null;
     ?>
     <script>

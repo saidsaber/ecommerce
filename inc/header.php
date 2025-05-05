@@ -90,7 +90,16 @@
                     <button class="btn btn-outline-dark" type="submit">
                         <i class="bi bi-cart-fill me-1"></i>
                         السلة
-                        <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                        <?php
+                            $number = 0;
+                            if(isset($_SESSION['user'])){
+                                $query = "SELECT COUNT(*) as number FROM cart where userId = '{$_SESSION['user']}' and shipmentId = '0'";
+                                $result = mysqli_query($conn , $query);
+                                $number = $row = mysqli_fetch_assoc($result)["number"];
+                            }
+
+                        ?>
+                        <span class="badge bg-dark text-white ms-1 rounded-pill"><?= $number?></span>
                     </button>
                 </form>
             </div>
