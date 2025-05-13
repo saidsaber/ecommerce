@@ -33,47 +33,127 @@ if (!empty($_SESSION['error']['login'])) {
 ?>
 <style>
     :root {
-        --primary-color: #2c3e50;
-        --secondary-color: #3498db;
-        --light-color: #ecf0f1;
-        --dark-color: #2c3e50;
+        --primary: #4361ee;
+        --primary-dark: #3a0ca3;
+        --secondary: #4895ef;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --light-gray: #e9ecef;
+        --success: #4cc9f0;
+        --danger: #e63946;
+        --warning: #f8961e;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
     }
 
     body {
         font-family: 'Tajawal', sans-serif;
-        background-color: #f8f9fa;
+        background-color: #f5f7fa;
+        color: var(--dark);
     }
 
-    .products-header {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    /* رأس الصفحة */
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         color: white;
-        padding: 4rem 0;
+        padding: 6rem 0 4rem;
         margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-title {
+        font-weight: 800;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    /* شبكة المنتجات */
+    .products-container {
+        padding: 0 1.5rem;
+        margin-bottom: 4rem;
     }
 
     .products-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 2rem;
-        padding: 0 2rem;
     }
 
     .product-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
         position: relative;
     }
 
     .product-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 3;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .favorite-btn {
+        background: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .favorite-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .favorite-btn i {
+        color: var(--danger);
+        font-size: 1.1rem;
     }
 
     .product-image {
-        height: 200px;
+        height: 220px;
         overflow: hidden;
         position: relative;
     }
@@ -82,19 +162,11 @@ if (!empty($_SESSION['error']['login'])) {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s;
+        transition: transform 0.5s ease;
     }
 
     .product-card:hover .product-image img {
-        transform: scale(1.1);
-    }
-
-    .product-badge {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 2;
-        cursor: pointer;
+        transform: scale(1.05);
     }
 
     .product-content {
@@ -104,14 +176,27 @@ if (!empty($_SESSION['error']['login'])) {
     .product-title {
         font-weight: 700;
         margin-bottom: 0.5rem;
-        color: var(--dark-color);
+        color: var(--dark);
+        font-size: 1.1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 3em;
     }
 
     .product-price {
         font-size: 1.25rem;
-        color: var(--secondary-color);
+        color: var(--primary);
         font-weight: 700;
         margin-bottom: 1rem;
+    }
+
+    .product-price .old-price {
+        font-size: 0.9rem;
+        color: var(--gray);
+        text-decoration: line-through;
+        margin-right: 0.5rem;
     }
 
     .product-actions {
@@ -121,40 +206,133 @@ if (!empty($_SESSION['error']['login'])) {
     }
 
     .btn-details {
-        background-color: var(--primary-color);
+        background-color: var(--primary);
         color: white;
         border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        transition: background-color 0.3s;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        flex-grow: 1;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .btn-details:hover {
-        background-color: var(--secondary-color);
+        background-color: var(--primary-dark);
         color: white;
+        transform: translateY(-2px);
     }
 
+    .btn-details i {
+        font-size: 0.9rem;
+    }
+
+    /* التصفّح */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 3rem 0;
+        flex-wrap: wrap;
+    }
+
+    .page-link {
+        padding: 0.7rem 1.2rem;
+        background-color: white;
+        color: var(--dark);
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid var(--light-gray);
+        transition: var(--transition);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+    }
+
+    .page-link:hover {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-link.active {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-link.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+        background-color: var(--light-gray);
+    }
+
+    /* رسائل التنبيه */
+    .alert-message {
+        max-width: 800px;
+        margin: 2rem auto;
+        border-radius: 10px;
+    }
+
+    /* التكيف مع الشاشات الصغيرة */
     @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
         .products-grid {
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+
+        .product-image {
+            height: 180px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-section {
+            padding: 4rem 0 3rem;
+        }
+
+        .hero-title {
+            font-size: 1.8rem;
+        }
+
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-link {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.9rem;
         }
     }
 </style>
 <!-- Header-->
-<!-- رأس الصفحة -->
-<header class="products-header text-center">
-    <div class="container">
-        <?php
-        $query = "SELECT * FROM catigory where cateId='{$_GET['id']}'";
-        $res = mysqli_query($conn, $query);
-        $row = mysqli_fetch_assoc($res);
-        ?>
-
-        <h1 class="display-4 fw-bolder"><?= $row['cateName'] ?></h1>
-        <p class="lead">اكتشف أحدث منتجاتنا بأسعار تنافسية</p>
+<section class="hero-section text-center">
+    <div class="container hero-content">
+        <h1 class="hero-title animate__animated animate__fadeInDown">
+            <?php
+            $query = "SELECT * FROM catigory where cateId='{$_GET['id']}'";
+            $res = mysqli_query($conn, $query);
+            $row = mysqli_fetch_assoc($res);
+            ?>
+            <?= $row['cateName'] ?>
+        </h1>
+        <p class="hero-subtitle animate__animated animate__fadeIn animate__delay-1s">اكتشف أحدث المنتجات بأسعار تنافسية
+            وجودة عالية</p>
     </div>
-</header>
-
+</section>
 <!-- Section-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">

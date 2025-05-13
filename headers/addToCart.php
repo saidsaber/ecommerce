@@ -5,13 +5,11 @@ session_start();
 if(isset($_SESSION['user'])){
     $id = $_SESSION['user'];
     $prodcutId = $_POST['productId'];
-    // $colorAndSize = 'siad';
-    // $colorAndSize = $_POST['colorAndSize'];
-    // if(isset($_POST['colorAndSize'])){
-    // }    
+    $sizeId = $_POST['sizeId'];   
+    $colorId = $_POST['colorId'];   
 
     // echo var_dump($colorAndSize);
-    addToCart($id , $prodcutId);
+    addToCart($id , $prodcutId , $sizeId , $colorId);
     
     header("Location: {$_SERVER['HTTP_REFERER']}");
     exit;
